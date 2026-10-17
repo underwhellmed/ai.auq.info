@@ -33,6 +33,13 @@ function allowedOrigin(request, env) {
   return allowlist.includes(origin) ? origin : null;
 }
 
+// Health check: opening /api/chat in a browser should return JSON, not HTTP 405.
+export async function onRequestGet({ request, env }) {
+  const origin = allowedOrigin(request, env);
+  if (origin === null) return json({ error: { message: "This website origin is not allowed. Configure ALLOWED_ORIGINS in Cloudflare." } }, 403);
+  return json({ ok: true, service: "AUQ API", methods: ["POST", "OPTIONS"] }, 200, origin ? { "Access-Control-Allow-Origin": origin, "Vary": "Origin" } : {});
+}
+
 export async function onRequestOptions({ request, env }) {
   const origin = allowedOrigin(request, env);
   if (origin === null) return new Response(null, { status: 403 });
