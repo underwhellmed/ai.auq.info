@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f6f8">
+<title>AUQ AI</title>
+<style>
+:root{--bg:#f5f6f8;--ink:#202127;--line:#e5e7ec;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+*{box-sizing:border-box}html,body{margin:0;width:100%}body{height:100dvh;overflow:hidden;background:var(--bg)}
+button,input,textarea{font:inherit}button{border:0;cursor:pointer;color:inherit;background:none}
+svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.app{height:100dvh;display:flex;flex-direction:column}
+.topbar{height:64px;flex-shrink:0;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:14px;background:#fbfcfd}
+.brand{font-size:27px;font-weight:900;letter-spacing:-2px}.brand span{color:#9da3ad}
+.pill{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:#727987;font-size:12px;background:#fff}
+.dot{width:7px;height:7px;border-radius:50%;background:#46a27d}.dot.off{background:#b4bac4}
+.top-actions{margin-left:auto;display:flex;gap:10px}
+.icon-btn{width:40px;height:40px;border:1px solid var(--line);background:#fff;border-radius:14px;display:grid;place-items:center;color:#59616d}
+.icon-btn:hover{background:#e9ecf1}
+.layout{display:flex;flex:1;min-height:0}
+.rail{width:272px;flex:0 0 272px;border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:14px;background:#f9fafb;min-height:0}
+.new-chat{width:100%;height:44px;border-radius:14px;background:#22252b;color:#fff;font-weight:650;display:flex;align-items:center;justify-content:center;gap:9px}
+.new-chat:hover,.send:hover{background:#3a3d44}
+.rail-label{font-size:10px;font-weight:850;letter-spacing:1.2px;color:#969ca7;padding:0 7px}
+.history{overflow:auto;min-height:0;display:grid;align-content:start;gap:4px;flex:1}
+.history-item{width:100%;display:flex;align-items:center;gap:9px;padding:11px 10px;border-radius:12px;text-align:left;color:#666e7a;font-size:13px}
+.history-item:hover{background:#eceef2}.history-item.active{background:#e7e9ee;color:#25272d}
+.history-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.del{opacity:0;padding:2px 6px;border-radius:6px}.history-item:hover .del{opacity:1}
+.rail-bottom{border-top:1px solid var(--line);padding-top:12px;color:#8b929e;font-size:11px;line-height:1.6}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.content{flex:1;min-height:0;overflow:auto;padding:24px clamp(16px,4vw,56px) 26px;display:flex;flex-direction:column}
+.conversation{width:min(820px,100%);margin:0 auto;flex:1;display:flex;flex-direction:column;gap:25px;padding-bottom:25px}
+.welcome{margin:auto auto 30px;text-align:center;width:min(610px,100%)}
+.welcome-mark{font-size:36px;font-weight:900;letter-spacing:-3px}.welcome-mark span{color:#a4aab4}
+.welcome h1{font-size:clamp(28px,4vw,39px);letter-spacing:-1.6px;margin:18px 0 8px}
+.welcome p{color:#8b929e;font-size:14px;line-height:1.6;margin:0}
+.message{display:flex;gap:13px;align-items:flex-start;animation:appear .18s ease}
+.avatar{width:34px;height:34px;border-radius:12px;background:#e8ebf0;display:grid;place-items:center;flex-shrink:0;font-size:12px;font-weight:850}
+.assistant .avatar{background:#23262d;color:#fff}
+.message-content{min-width:0;flex:1;padding-top:2px}
+.message-head{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.message-head strong{font-size:12px}.message-head small{font-size:10px;color:#9aa1ab}
+.message-text{font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;user-select:text}
+.message-text code{background:#f0f2f5;border-radius:5px;padding:2px 5px;font-size:12px}
+.message-text pre{white-space:pre-wrap;overflow:auto;background:#20232a;color:#f4f5f7;padding:14px;border-radius:12px}
+.message-actions{display:flex;gap:4px;margin-top:9px}
+.mini{display:inline-grid;place-items:center;width:31px;height:29px;border-radius:8px;color:#9299a4}
+.mini:hover{background:#f0f2f5;color:#4d5562}
+.composer-area{width:min(820px,100%);margin:0 auto}
+.composer{border:1px solid #dfe2e8;background:#fff;border-radius:21px;padding:12px;box-shadow:0 8px 30px #20242b08}
+.composer:focus-within{border-color:#c9ced7}
+.composer textarea{display:block;width:100%;border:0;outline:0;resize:none;min-height:55px;max-height:180px;padding:6px 7px;background:transparent;font-size:14px;line-height:1.6;color:var(--ink)}
+.composer-bottom{display:flex;align-items:center;gap:8px;padding-top:7px}
+.soft-btn{height:33px;padding:0 11px;border-radius:10px;background:#f1f3f6;color:#707886;font-size:11px;font-weight:650;display:flex;align-items:center;gap:5px}
+.soft-btn:hover{background:#e9ecf1}
+.hint{font-size:10px;color:#a0a6b0}
+.send{margin-left:auto;width:38px;height:36px;border-radius:12px;background:#22252b;color:#fff;display:grid;place-items:center}
+.send:disabled{opacity:.6;cursor:default}
+.footnote{text-align:center;color:#a1a7b1;font-size:10px;margin-top:11px}
+.thinking{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:13px;background:#fff;color:#818895;font-size:12px;width:max-content}
+.dots{display:flex;gap:4px}.dots i{width:5px;height:5px;border-radius:50%;background:#858c98;animation:pulse 1.15s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+.toast{position:fixed;right:18px;bottom:18px;z-index:200;background:#22252b;color:#fff;padding:12px 15px;border-radius:12px;font-size:12px;max-width:calc(100vw - 36px)}
+.hidden{display:none!important}
+.tabs{display:flex;gap:4px;background:#eef0f4;padding:4px;border-radius:12px}
+.tab{padding:7px 16px;border-radius:9px;font-size:12px;font-weight:700;color:#707886}
+.tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px #0001}
+.img-mode #rail,.img-mode #newChatTop{display:none!important}
+#imgRail{display:none}.img-mode #imgRail{display:flex}
+.gal-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:grid;align-content:start;gap:18px;padding-right:2px}
+.bucket .rail-label{margin:0 0 8px}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.thumb{aspect-ratio:1;padding:0;border-radius:10px;overflow:hidden;background:#e7e9ee;border:1px solid var(--line)}
+.thumb:hover{border-color:#aeb8c8}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-empty{color:#9097a3;font-size:12px;line-height:1.6;padding:8px}
+.lightbox{position:fixed;inset:0;background:#171a20cc;backdrop-filter:blur(5px);display:grid;place-items:center;z-index:100;padding:18px}
+.lb{background:#fff;border-radius:20px;padding:16px;width:min(720px,100%);max-height:92dvh;overflow:auto;display:grid;gap:12px}
+.lb img{max-width:100%;max-height:60dvh;border-radius:12px;display:block;margin:0 auto}
+.lb p{margin:0;font-size:13px;line-height:1.6;overflow-wrap:anywhere;user-select:text}
+.lb small{color:#9aa1ab;font-size:11px}.lb a{text-decoration:none}
+.lb-actions{display:flex;gap:8px;justify-content:flex-end}
+@media(max-width:760px){.img-mode #imgRail{display:none}.img-mode #imgRail.open{display:flex}}
+.img-card img{max-width:min(100%,520px);border-radius:14px;border:1px solid var(--line);display:block;background:#fff}
+.img-card .message-actions{margin-top:10px}
+.img-card a{text-decoration:none}
+@keyframes pulse{0%,60%,100%{opacity:.28;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:760px){.topbar{height:58px;padding:0 14px}.pill{display:none}.rail{display:none;position:absolute;z-index:40;top:0;bottom:0;box-shadow:10px 0 30px #0001}.rail.open{display:flex}.layout{position:relative}.content{padding:14px 12px 18px}.message-text{font-size:13px}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">auq<span>.</span></div>
+    <div class="pill"><span class="dot" id="saveDot"></span><span id="saveStatus">Chats saved on this device</span></div>
+    <nav class="tabs" aria-label="Mode"><button class="tab active" data-tab="chat">Chat</button><button class="tab" data-tab="image">Images</button></nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="historyToggle" aria-label="Toggle chat history"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <button class="icon-btn" id="newChatTop" aria-label="New chat"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="rail" id="rail">
+      <button class="new-chat" id="newChat"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>New chat</span></button>
+      <div class="rail-label">YOUR CHATS</div>
+      <div class="history" id="history"></div>
+      <div class="rail-bottom">AUQ AI · Your space to think.<br>Conversations are stored locally.</div>
+    </aside>
+    <aside class="rail" id="imgRail">
+      <div class="rail-label">YOUR IMAGES</div>
+      <div class="gal-scroll" id="imgGallery"></div>
+      <div class="rail-bottom">Saved on this device.</div>
+    </aside>
+    <main class="main" id="chatView">
+      <div class="content" id="content">
+        <div class="conversation" id="conversation"></div>
+        <div class="composer-area">
+          <div class="composer">
+            <textarea id="prompt" rows="2" placeholder="Message AUQ…" aria-label="Message AUQ"></textarea>
+            <div class="composer-bottom">
+              <button class="soft-btn" id="attachBtn" title="Attach a text file"></button>
+              <input type="file" id="fileInput" class="hidden" accept=".txt,.md,.csv,.json,.html,.css,.js,.py,.xml,.yaml,.yml">
+              <span class="hint">Enter to send · Shift + Enter for a new line</span>
+              <button class="send" id="sendBtn" aria-label="Send message"></button>
+            </div>
+          </div>
+          <div class="footnote">AI can make mistakes. Check important information.</div>
+        </div>
+      </div>
+    </main>
+    <main class="main hidden" id="imageView">
+      <div class="content" id="imgContent">
+        <div class="conversation" id="gallery"></div>
+        <div class="composer-area">
+          <div class="composer">
+            <textarea id="imgPrompt" rows="2" placeholder="Describe an image…" aria-label="Describe an image"></textarea>
+            <div class="composer-bottom">
+              <span class="hint">Enter to generate · Shift + Enter for a new line</span>
+              <button class="send" id="imgSendBtn" aria-label="Generate image"></button>
+            </div>
+          </div>
+          <div class="footnote">Generated images are saved on this device and sorted by date in the sidebar.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="lightbox hidden" id="lightbox"></div>
+<div class="toast hidden" id="toast"></div>
+<script>
+(() => {
+"use strict";
+// ---- API: the only backend this app talks to ----
+const API_URL = "https://auq-llm.karsons.workers.dev/api/chat";
+const API_KEY = "text-auq";
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const svg = p => `<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+const I = {
+  plus: svg('<path d="M12 5v14M5 12h14"/>'),
+  check: svg('<path d="m5 12 4 4L19 6"/>'),
+  send: svg('<path d="M12 19V5M5 12l7-7 7 7"/>'),
+  copy: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),
+  vol: svg('<path d="M4 10v4h4l5 4V6l-5 4H4"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11"/>'),
+  regen: svg('<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 17 6l3 6M4 12l3 6a7 7 0 0 0 11.4-3"/>'),
+  chat: svg('<path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 3V6a2 2 0 0 1 1-2z"/>')
+};
+const ATTACH = I.plus + " Attach";
+const now = () => new Date().toISOString();
+const uid = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+const state = {chats: [], active: null, busy: false, attached: ""};
+
+function toast(msg){const el=$("#toast");el.textContent=msg;el.classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add("hidden"),3000)}
+function blankChat(){return {id:uid(),title:"New chat",created:now(),updated:now(),messages:[]}}
+function saveChats(){try{localStorage.setItem("auq_ai_chats",JSON.stringify(state.chats));$("#saveStatus").textContent="Chats saved on this device";$("#saveDot").classList.remove("off")}catch(e){$("#saveStatus").textContent="Storage full";$("#saveDot").classList.add("off");toast("Could not save chats. Browser storage may be full.")}}
+function loadChats(){try{const p=JSON.parse(localStorage.getItem("auq_ai_chats")||"[]");state.chats=Array.isArray(p)?p:[]}catch(e){state.chats=[]}if(!state.chats.length)state.chats=[blankChat()];state.active=state.chats[0].id}
+const activeChat = () => state.chats.find(c => c.id === state.active);
+
+function newChat(){const c=blankChat();state.chats.unshift(c);state.active=c.id;saveChats();renderHistory();renderMessages();$("#rail").classList.remove("open");$("#prompt").focus()}
+function selectChat(id){state.active=id;renderHistory();renderMessages();$("#rail").classList.remove("open")}
+function deleteChat(id){state.chats=state.chats.filter(c=>c.id!==id);if(!state.chats.length)state.chats.push(blankChat());if(!state.chats.some(c=>c.id===state.active))state.active=state.chats[0].id;saveChats();renderHistory();renderMessages()}
+
+function renderHistory(){
+  const list=$("#history");
+  list.innerHTML=state.chats.map(c=>`<button class="history-item ${c.id===state.active?"active":""}" data-chat="${esc(c.id)}">${I.chat}<span class="history-title">${esc(c.title||"New chat")}</span><span class="del" data-del="${esc(c.id)}" title="Delete chat">×</span></button>`).join("");
+  list.querySelectorAll("[data-chat]").forEach(b=>b.onclick=e=>{if(e.target.closest("[data-del]")){e.stopPropagation();deleteChat(e.target.closest("[data-del]").dataset.del)}else selectChat(b.dataset.chat)});
+}
+function formatText(t){let s=esc(t);s=s.replace(/```([\s\S]*?)```/g,(_,c)=>`<pre>${c.trim()}</pre>`);return s.replace(/`([^`]+)`/g,"<code>$1</code>")}
+
+function renderMessages(){
+  const c=activeChat(),conv=$("#conversation");
+  if(!c.messages.length){conv.innerHTML=`<div class="welcome"><div class="welcome-mark">auq<span>.</span></div><h1>What can I help with?</h1><p>Think, create, explore, and build — all in one place.</p></div>`;return}
+  conv.innerHTML=c.messages.map((m,i)=>{const a=m.role==="assistant";return `<article class="message ${a?"assistant":"user"}"><div class="avatar">${a?"auq":"You"}</div><div class="message-content"><div class="message-head"><strong>${a?"auq":"You"}</strong><small>${esc(new Date(m.time||Date.now()).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}))}</small></div><div class="message-text">${formatText(m.content||"")}</div>${a?`<div class="message-actions"><button class="mini" data-copy="${i}" aria-label="Copy response">${I.copy}</button><button class="mini" data-speak="${i}" aria-label="Read response aloud">${I.vol}</button><button class="mini" data-retry="${i}" aria-label="Regenerate response">${I.regen}</button></div>`:""}</div></article>`}).join("");
+  conv.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>copyText(c.messages[+b.dataset.copy].content));
+  conv.querySelectorAll("[data-speak]").forEach(b=>b.onclick=()=>speak(c.messages[+b.dataset.speak].content));
+  conv.querySelectorAll("[data-retry]").forEach(b=>b.onclick=()=>regenerate(+b.dataset.retry));
+  $("#content").scrollTop=$("#content").scrollHeight;
+}
+
+function addMessage(role,content,extra={}){
+  const c=activeChat();c.messages.push({role,content,time:now(),...extra});c.updated=now();
+  if(role==="user"&&c.title==="New chat")c.title=content.replace(/\s+/g," ").slice(0,42)||"New chat";
+  saveChats();renderHistory();renderMessages();
+}
+const apiMessages = c => c.messages.filter(m=>m.role==="user"||m.role==="assistant").map(m=>({role:m.role,content:m.content}));
+
+function setBusy(v){state.busy=v;$("#sendBtn").disabled=v;$("#sendBtn").innerHTML=v?'<span class="dots"><i></i><i></i><i></i></span>':I.send}
+function showThinking(){hideThinking();const r=document.createElement("article");r.id="thinking";r.className="message assistant";r.innerHTML=`<div class="avatar">auq</div><div class="message-content"><div class="thinking"><span>Thinking</span><span class="dots"><i></i><i></i><i></i></span></div></div>`;$("#conversation").appendChild(r);$("#content").scrollTop=$("#content").scrollHeight}
+function hideThinking(){$("#thinking")?.remove()}
+
+// Single request helper for send + regenerate
+async function ask(chat){
+  const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY},body:JSON.stringify({messages:apiMessages(chat)})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error?.message||data.error||data.message||`Request failed (${res.status})`);
+  const a=data.choices?.[0]?.message?.content??data.output_text??data.response??data.reply??data.message?.content??data.message??data.content??data.text??data;
+  return typeof a==="string"?a:JSON.stringify(a,null,2);
+}
+async function run(chat){
+  setBusy(true);showThinking();
+  try{addMessage("assistant",await ask(chat))}
+  catch(err){addMessage("assistant",`I couldn’t reach the AUQ API.\n\n${err.message}\n\nYour conversation is still saved locally.`,{error:true})}
+  finally{hideThinking();setBusy(false)}
+}
+function send(){
+  if(state.busy)return;
+  const input=$("#prompt"),text=input.value.trim(),full=text+(state.attached?`\n\n[Attached file content]\n${state.attached}`:"");
+  if(!full)return;
+  input.value="";input.style.height="";state.attached="";$("#attachBtn").innerHTML=ATTACH;
+  addMessage("user",full);run(activeChat());
+}
+function regenerate(index){
+  if(state.busy)return;
+  const c=activeChat(),u=c.messages.slice(0,index).map(m=>m.role).lastIndexOf("user");
+  if(u<0){toast("No prompt found to regenerate");return}
+  c.messages=c.messages.slice(0,u+1);saveChats();renderMessages();run(c);
+}
+
+function copyText(text){
+  const fb=()=>{const el=document.createElement("textarea");el.value=text;el.style.cssText="position:fixed;opacity:0";document.body.appendChild(el);el.select();try{document.execCommand("copy");toast("Copied response")}catch(_){toast("Clipboard unavailable")}el.remove()};
+  navigator.clipboard?.writeText?navigator.clipboard.writeText(text).then(()=>toast("Copied response")).catch(fb):fb();
+}
+function speak(text){
+  if(!("speechSynthesis" in window)){toast("Speech playback is not supported in this browser");return}
+  if(speechSynthesis.speaking){speechSynthesis.cancel();return}
+  const u=new SpeechSynthesisUtterance(text);u.onerror=()=>toast("Could not play speech");speechSynthesis.speak(u);
+}
+
+$("#sendBtn").onclick=send;
+$("#prompt").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+$("#prompt").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,180)+"px"});
+$("#newChat").onclick=newChat;$("#newChatTop").onclick=newChat;
+$("#historyToggle").onclick=()=>{const r=$(document.body.classList.contains("img-mode")?"#imgRail":"#rail");r.classList.toggle(innerWidth<=760?"open":"hidden")};
+$("#attachBtn").onclick=()=>$("#fileInput").click();
+$("#fileInput").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(f.size>1024*1024){toast("Text attachment must be under 1 MB");return}
+  state.attached=await f.text();$("#attachBtn").innerHTML=I.check+" "+esc(f.name.slice(0,18));toast("File attached to next message");e.target.value="";
+};
+addEventListener("storage",e=>{if(e.key==="auq_ai_chats"){loadChats();renderHistory();renderMessages()}});
+window.AUQAI={exportChats:()=>JSON.parse(JSON.stringify(state.chats))};
+
+// ---- Image tab ----
+const IMG_URL = "https://auq-img-llm.karsons.workers.dev";
+const IMG_KEY = "auq";
+const img = {items: [], all: [], busy: false};
+function setTab(t){
+  const on = t === "image";
+  document.body.classList.toggle("img-mode", on);
+  $("#chatView").classList.toggle("hidden", on);
+  $("#imageView").classList.toggle("hidden", !on);
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === t));
+  (on ? $("#imgPrompt") : $("#prompt")).focus();
+}
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => setTab(b.dataset.tab));
+// Finds an image URL / base64 string in whatever shape the worker returns
+const findImg = d => {
+  if(!d) return "";
+  if(typeof d === "string") return d;
+  if(Array.isArray(d)) return findImg(d[0]);
+  for(const k of ["url","image_url","b64_json","base64","image","images","data","output","result"]){const r = findImg(d[k]); if(r) return r}
+  return "";
+};
+const toSrc = v => /^(https?:|data:|blob:)/.test(v) ? v : "data:image/png;base64," + v;
+async function imgRequest(prompt){
+  const res = await fetch(IMG_URL, {method:"POST", headers:{"Content-Type":"application/json","x-api-key":IMG_KEY}, body:JSON.stringify({prompt, messages:[{role:"user", content:prompt}]})});
+  if((res.headers.get("content-type") || "").startsWith("image/") && res.ok) return blobToData(await res.blob());
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data.error?.message || data.error || data.message || `Request failed (${res.status})`);
+  const v = findImg(data);
+  if(!v) throw new Error("The worker didn’t return an image.");
+  return toSrc(v);
+}
+function renderGallery(){
+  const g = $("#gallery");
+  if(!img.items.length){g.innerHTML = `<div class="welcome"><div class="welcome-mark">auq<span>.</span></div><h1>What should I create?</h1><p>Describe an image and I’ll generate it.</p></div>`; return}
+  g.innerHTML = img.items.map(it => {
+    const body = it.pending ? `<div class="thinking"><span>Generating</span><span class="dots"><i></i><i></i><i></i></span></div>`
+      : it.error ? `<div class="message-text">${esc(it.error)}</div>`
+      : `<div class="img-card"><img src="${esc(it.src)}" alt="${esc(it.prompt)}"><div class="message-actions"><a class="soft-btn" href="${esc(it.src)}" download="auq-image.png" target="_blank" rel="noopener">Download</a></div></div>`;
+    return `<article class="message user"><div class="avatar">You</div><div class="message-content"><div class="message-text">${esc(it.prompt)}</div></div></article><article class="message assistant"><div class="avatar">auq</div><div class="message-content">${body}</div></article>`;
+  }).join("");
+  $("#imgContent").scrollTop = $("#imgContent").scrollHeight;
+}
+function setImgBusy(v){img.busy = v; $("#imgSendBtn").disabled = v; $("#imgSendBtn").innerHTML = v ? '<span class="dots"><i></i><i></i><i></i></span>' : I.send}
+async function generate(){
+  if(img.busy) return;
+  const input = $("#imgPrompt"), prompt = input.value.trim();
+  if(!prompt) return;
+  input.value = ""; input.style.height = "";
+  const it = {id:uid(), prompt, created:now(), pending:true};
+  img.items.push(it); setImgBusy(true); renderGallery();
+  try{it.src = await imgRequest(prompt); saveImage(it)}
+  catch(e){it.error = `I couldn’t generate that image.\n\n${e.message}`}
+  it.pending = false; setImgBusy(false); renderGallery();
+}
+$("#imgSendBtn").onclick = generate;
+$("#imgPrompt").addEventListener("keydown", e => {if(e.key === "Enter" && !e.shiftKey){e.preventDefault(); generate()}});
+$("#imgPrompt").addEventListener("input", e => {e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight,180) + "px"});
+// ---- Saved images (IndexedDB) + dated sidebar gallery ----
+const blobToData = b => new Promise((res, rej) => {const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(b)});
+const idb = {
+  db: null,
+  open(){return new Promise((res, rej) => {const r = indexedDB.open("auq_img", 1); r.onupgradeneeded = () => r.result.createObjectStore("images", {keyPath:"id"}); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error)})},
+  async tx(mode, fn){const db = this.db || (this.db = await this.open()); return new Promise((res, rej) => {const t = db.transaction("images", mode), q = fn(t.objectStore("images")); t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error)})}
+};
+function bucketLabel(iso){
+  const d = new Date(iso), t = new Date(), day = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(t) - day(d)) / 864e5);
+  if(diff <= 0) return "Today";
+  if(diff === 1) return "Yesterday";
+  if(diff < 7) return "Previous 7 days";
+  if(diff < 30) return "Previous 30 days";
+  return d.toLocaleDateString([], {month:"long", year:"numeric"});
+}
+function renderSidebar(){
+  const box = $("#imgGallery");
+  if(!img.all.length){box.innerHTML = `<div class="gal-empty">No images yet. Generated images will be sorted into date groups here.</div>`; return}
+  const groups = new Map();
+  [...img.all].sort((a, b) => b.created.localeCompare(a.created)).forEach(it => {const k = bucketLabel(it.created); if(!groups.has(k)) groups.set(k, []); groups.get(k).push(it)});
+  box.innerHTML = [...groups].map(([k, list]) => `<section class="bucket"><div class="rail-label">${esc(k.toUpperCase())} · ${list.length}</div><div class="thumbs">${list.map(it => `<button class="thumb" data-id="${esc(it.id)}" title="${esc(it.prompt)}"><img loading="lazy" src="${esc(it.src)}" alt="${esc(it.prompt)}"></button>`).join("")}</div></section>`).join("");
+}
+function saveImage(it){
+  const rec = {id:it.id, prompt:it.prompt, src:it.src, created:it.created};
+  img.all.push(rec); renderSidebar();
+  idb.tx("readwrite", s => s.put(rec)).catch(() => toast("Couldn’t save this image on the device"));
+}
+function loadSaved(){
+  try{idb.tx("readonly", s => s.getAll()).then(a => {img.all = a || []; renderSidebar()}).catch(() => toast("Couldn’t load saved images"))}
+  catch(_){toast("Saved images aren’t available in this browser")}
+}
+function closeLightbox(){$("#lightbox").classList.add("hidden"); $("#lightbox").innerHTML = ""}
+function openLightbox(id){
+  const it = img.all.find(x => x.id === id); if(!it) return;
+  const lb = $("#lightbox"); lb.dataset.id = id;
+  lb.innerHTML = `<div class="lb"><img src="${esc(it.src)}" alt="${esc(it.prompt)}"><p>${esc(it.prompt)}</p><small>${esc(new Date(it.created).toLocaleString())}</small><div class="lb-actions"><a class="soft-btn" href="${esc(it.src)}" download="auq-image.png" target="_blank" rel="noopener">Download</a><button class="soft-btn" data-del>Delete</button><button class="soft-btn" data-close>Close</button></div></div>`;
+  lb.classList.remove("hidden"); $("#imgRail").classList.remove("open");
+}
+function deleteImage(id){
+  img.all = img.all.filter(x => x.id !== id); img.items = img.items.filter(x => x.id !== id);
+  idb.tx("readwrite", s => s.delete(id)).catch(() => {});
+  renderSidebar(); renderGallery(); closeLightbox();
+}
+$("#imgGallery").addEventListener("click", e => {const b = e.target.closest(".thumb"); if(b) openLightbox(b.dataset.id)});
+$("#lightbox").addEventListener("click", e => {
+  if(e.target === $("#lightbox") || e.target.closest("[data-close]")) closeLightbox();
+  else if(e.target.closest("[data-del]")) deleteImage($("#lightbox").dataset.id);
+});
+addEventListener("keydown", e => {if(e.key === "Escape") closeLightbox()});
+renderGallery(); renderSidebar(); loadSaved(); $("#imgSendBtn").innerHTML = I.send;
+
+$("#attachBtn").innerHTML=ATTACH;$("#sendBtn").innerHTML=I.send;
+loadChats();renderHistory();renderMessages();
+})();
+</script>
+</body>
+</html>
